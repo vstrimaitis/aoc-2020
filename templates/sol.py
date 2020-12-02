@@ -20,32 +20,17 @@ def timed(message=None):
     return inner
 
 def read():
-    arr = []
-    for line in sys.stdin.readlines():
-        line = line.strip()
-        if not line:
-            continue
-        arr.append(int(line))
-    return arr
+    return
 
 
 @timed("Part 1")
 def part1(data):
-    for i in range(len(data)):
-        for j in range(i+1, len(data)):
-            if data[i] + data[j] == 2020:
-                return data[i]*data[j]
-    raise Exception("Not found")
+    return
 
 
 @timed("Part 2")
 def part2(data):
-    for i in range(len(data)):
-        for j in range(i+1, len(data)):
-            for k in range(j+1, len(data)):
-                if data[i] + data[j] + data[k] == 2020:
-                    return data[i]*data[j]*data[k]
-    raise Exception("Not found")
+    return
 
 INPUT = read()
 part1(INPUT)
