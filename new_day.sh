@@ -4,7 +4,8 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 
-DAY_FOLDER=$(printf "%02d" $1)
+export DAY=$1
+DAY_FOLDER=$(printf "%02d" $DAY)
 TEMPLATES_FOLDER="templates"
 
 if [[ -d $DAY_FOLDER ]] ; then
@@ -16,3 +17,12 @@ if [[ -d $DAY_FOLDER ]] ; then
 fi
 
 cp -r $TEMPLATES_FOLDER $DAY_FOLDER
+
+
+for filename in $DAY_FOLDER/*; do
+    # envsubst < 
+    # echo $filename
+    tmpfile=$(mktemp)
+    envsubst < $filename > $tmpfile
+    mv $tmpfile $filename
+done

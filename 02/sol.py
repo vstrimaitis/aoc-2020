@@ -38,7 +38,7 @@ def part2():
     for (times, char, pwd) in pwds:
         if is_valid_2(times, char, pwd):
             ans += 1
-    print("Part 1: ", ans)
+    print("Part 2: ", ans)
 
 part1()
 part2()
