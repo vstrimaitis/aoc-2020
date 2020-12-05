@@ -1,22 +1,7 @@
 from puzzle import PuzzleContext
 
-def calc(n, sides):
-    lo = 0
-    hi = n-1
-    for c in sides:
-        mid = (lo+hi)//2
-        if c == "L":
-            hi = mid
-        else:
-            lo = mid+1
-    return lo
-
 def get_id(s):
-    fb = s[:7]
-    lr = s[7:]
-    row = calc(128, ["L" if x == "F" else "B" for x in fb])
-    col = calc(8, lr)
-    return row*8+col
+    return int("".join(["0" if x in "FL" else "1" for x in s]), 2) 
 
 with PuzzleContext(year=2020, day=5) as ctx:
     ids = []
