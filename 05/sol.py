@@ -9,10 +9,7 @@ with PuzzleContext(year=2020, day=5) as ctx:
         ids.append(get_id(l))
     ctx.submit(1, max(ids))
 
-    my_id = -1
-    ids = sorted(ids)
-    for i in range(len(ids)-1):
-        if ids[i+1] != ids[i]+1:
-            my_id = ids[i]+1
-            break
+    all_nums = set(range(min(ids), max(ids)+1))
+    my_id = list(all_nums - set(ids))
+    my_id = my_id[0]
     ctx.submit(2, my_id)
