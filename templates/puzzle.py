@@ -17,6 +17,14 @@ class PuzzleContext:
     def __exit__(self, type, value, traceback):
         pass
 
+    @property
+    def lines(self):
+        return self.data.split("\n")
+
+    @property
+    def nonempty_lines(self):
+        return [l for l in self.lines if l]
+
     def _get_data(self):
         if self._is_running_on_sample():
             input_path = f"s{sys.argv[1]}.txt"
@@ -29,6 +37,9 @@ class PuzzleContext:
     def submit(self, part: int, ans: str):
         if part not in [1, 2]:
             raise ValueError(f"Part must be either 1 or 2, was {part}")
+        if ans is None:
+            print(f"Skipping submission for part {part}")
+            return
         self._end_times[part-1] = time.time()
         self._log_answer(ans, part)
         if not self._is_running_on_sample():
