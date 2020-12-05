@@ -1,12 +1,12 @@
 from puzzle import PuzzleContext
-
-def get_id(s):
-    return int("".join(["0" if x in "FL" else "1" for x in s]), 2) 
+import re
 
 with PuzzleContext(year=2020, day=5) as ctx:
     ids = []
     for l in ctx.data.split("\n"):
-        ids.append(get_id(l))
+        l = re.sub(r"[FL]", "0", l)
+        l = re.sub(r"[BR]", "1", l)
+        ids.append(int(l, 2))
     ctx.submit(1, max(ids))
 
     all_nums = set(range(min(ids), max(ids)+1))
