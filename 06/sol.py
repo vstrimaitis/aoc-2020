@@ -3,8 +3,9 @@ from puzzle import PuzzleContext
 
 def calc1(group):
     d = dict()
+    group = group.strip()
     for g in group.split("\n"):
-        for x in g.strip():
+        for x in g:
             if x not in d:
                 d[x] = True
     # print(group, d)
@@ -16,7 +17,7 @@ def calc2(group):
     group = group.strip()
     num_groups = len(group.split("\n"))
     for g in group.split("\n"):
-        for x in g.strip():
+        for x in g:
             if x not in d:
                 d[x] = 0
             d[x] += 1
