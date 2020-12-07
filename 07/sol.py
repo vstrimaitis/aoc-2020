@@ -28,8 +28,8 @@ def dfs2(adj, u, dp):
     dp[u] = 1
     for v, cnt in adj[u]:
         if v not in visited:
-            dfs2(adj, v, dp)
-            dp[u] += cnt * dp[v]
+            dp[u] += cnt * dfs2(adj, v, dp)
+    return dp[u]
     
 
 
