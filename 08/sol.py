@@ -1,57 +1,40 @@
+import time
 from puzzle import PuzzleContext
+from interpreter import Program
+from printer import Printer
 
-def exec_prog(prog):
-    ip = 0
-    seen = set()
-    acc = 0
-
-    while True:
-        if ip >= len(prog):
-            break
-        op, arg = prog[ip].split()
-        if ip in seen:
-            return True, acc
-        seen.add(ip)
-        arg = int(arg)
-        if op == "nop":
-            ip += 1
-            continue
-        if op == "acc":
-            acc += arg
-            ip += 1
-            continue
-        if op == "jmp":
-            ip += arg
-            continue
-    return False, acc
-    
+printer = Printer() 
+def print_progress(p: Program):
+    printer.clear()
+    printer.print(p)
+    time.sleep(0.1)
 
 with PuzzleContext(year=2020, day=8) as ctx:
     ans1 = None
     ans2 = None
-    
-    lines = ctx.nonempty_lines
-    _, ans1 = exec_prog(lines)
 
+    p = Program(ctx.data)
+    p.run(cb=print_progress if ctx._is_running_on_sample() else None)
+    printer.commit()
+    ans1 = p.accumulator
+    ctx.submit(1, ans1)
+
+    lines = ctx.nonempty_lines
     for i in range(len(lines)):
         if "nop" in lines[i]:
-            l = lines[i]
             lines[i] = lines[i].replace("nop", "jmp")
-            looped, acc = exec_prog(lines)
-            lines[i] = l
-
-            if not looped:
-                ans2 = acc
+            p = Program("\n".join(lines))
+            p.run()
+            if not p.stuck_in_loop:
+                ans2 = p.accumulator
                 break
-        if "jmp" in lines[i]:
-            l = lines[i]
             lines[i] = lines[i].replace("jmp", "nop")
-            looped, acc = exec_prog(lines)
-            lines[i] = l
-
-            if not looped:
-                ans2 = acc
+        if "jmp" in lines[i]:
+            lines[i] = lines[i].replace("jmp", "nop")
+            p = Program("\n".join(lines))
+            p.run()
+            if not p.stuck_in_loop:
+                ans2 = p.accumulator
                 break
-
-    ctx.submit(1, ans1)
+            lines[i] = lines[i].replace("nop", "jmp")
     ctx.submit(2, ans2)
