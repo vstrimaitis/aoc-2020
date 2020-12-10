@@ -1,4 +1,7 @@
 {
+    "spellright.ignoreFiles": [
+        "**/*"
+    ],
     "python.autoComplete.extraPaths": [
         "01",
         "02",
