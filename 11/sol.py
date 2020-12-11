@@ -1,8 +1,13 @@
 from puzzle import PuzzleContext
 
-DIRS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+DIRS = [
+    (i, j)
+    for i in [-1, 0, 1]
+    for j in [-1, 0, 1]
+    if not (i == 0 and j == 0)
+]
 
-def count(brd, i, j, c):
+def count_adjacent(brd, i, j, c):
     n = len(brd)
     m = len(brd[0])
     cnt = 0
@@ -16,7 +21,7 @@ def count(brd, i, j, c):
     return cnt
 
 
-def count2(brd, i, j, c):
+def count_visible(brd, i, j, c):
     n = len(brd)
     m = len(brd[0])
     cnt = 0
@@ -35,72 +40,43 @@ def count2(brd, i, j, c):
     return cnt
 
 
-
-def simulate(brd):
+def simulate(brd, count_neighs, rules):
     new_brd = [[c for c in r] for r in brd]
     n = len(brd)
     m = len(brd[0])
-    changed = False
     for i in range(n):
         for j in range(m):
-            if brd[i][j] == ".":
-                continue
-            cnt_empty = count(brd, i, j, "L")
-            cnt_occ = count(brd, i, j, "#")
-            if brd[i][j] == "L" and cnt_occ == 0:
-                new_brd[i][j] = "#"
-                changed = True
-            if brd[i][j] == "#" and cnt_occ >= 4:
-                new_brd[i][j] = "L"
-                changed = True
-        
-    new_brd = ["".join(r) for r in new_brd]
-    return new_brd, changed
+            n_occupied = count_neighs(brd, i, j, "#")
+            new_brd[i][j] = rules[brd[i][j]](n_occupied)
 
-def simulate2(brd):
-    new_brd = [[c for c in r] for r in brd]
-    n = len(brd)
-    m = len(brd[0])
-    changed = False
-    for i in range(n):
-        for j in range(m):
-            if brd[i][j] == ".":
-                continue
-            cnt_empty = count2(brd, i, j, "L")
-            cnt_occ = count2(brd, i, j, "#")
-            if brd[i][j] == "L" and cnt_occ == 0:
-                new_brd[i][j] = "#"
-                changed = True
-            if brd[i][j] == "#" and cnt_occ >= 5:
-                new_brd[i][j] = "L"
-                changed = True
-        
     new_brd = ["".join(r) for r in new_brd]
+    changed = brd != new_brd
     return new_brd, changed
 
 
 with PuzzleContext(year=2020, day=11) as ctx:
-    ans1 = None
-    ans2 = None
-
+    # Part 1
     brd = ctx.nonempty_lines
-
     while True:
-        brd, changed = simulate(brd)
+        brd, changed = simulate(brd, count_adjacent, rules={
+            "L": lambda n_occupied: "#" if n_occupied == 0 else "L",
+            "#": lambda n_occupied: "L" if n_occupied >= 4 else "#",
+            ".": lambda _: ".",
+        })
         if not changed:
             break
 
-    ans1 = "".join(brd).count("#")
+    ctx.submit(1, "".join(brd).count("#"))
 
-    ctx.submit(1, ans1)
-
-
+    # Part 2
     brd = ctx.nonempty_lines
     while True:
-        brd, changed = simulate2(brd)
+        brd, changed = simulate(brd, count_visible, rules={
+            "L": lambda n_occupied: "#" if n_occupied == 0 else "L",
+            "#": lambda n_occupied: "L" if n_occupied >= 5 else "#",
+            ".": lambda _: ".",
+        })
         if not changed:
             break
 
-    ans2 = "".join(brd).count("#")
-
-    ctx.submit(2, ans2)
+    ctx.submit(2, "".join(brd).count("#"))
