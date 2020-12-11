@@ -7,29 +7,28 @@ DIRS = [
     if not (i == 0 and j == 0)
 ]
 
-def count_adjacent(brd, i, j, c):
+def is_inside(brd, i, j):
     n = len(brd)
     m = len(brd[0])
+    return i >= 0 and i < n and j >= 0 and j < m 
+
+def count_adjacent(brd, i, j, c):
     cnt = 0
     for di, dj in DIRS:
         ii = di + i
         jj = dj + j
-        if ii == i and jj == j:
-            continue
-        if ii >= 0 and ii < n and jj >= 0 and jj < m and brd[ii][jj] == c:
+        if is_inside(brd, ii, jj) and brd[ii][jj] == c:
             cnt += 1
     return cnt
 
 
 def count_visible(brd, i, j, c):
-    n = len(brd)
-    m = len(brd[0])
     cnt = 0
 
     for di, dj in DIRS:
         ii = i + di
         jj = j + dj
-        while ii >= 0 and ii < n and jj >= 0 and jj < m:
+        while is_inside(brd, ii, jj):
             if brd[ii][jj] != ".":
                 if brd[ii][jj] == c:
                     cnt += 1
