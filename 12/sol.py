@@ -34,18 +34,18 @@ def rotate_left_around_0(x, y, cnt):
     x, y = -y, x
     return rotate_left_around_0(x, y, cnt-1)
 
-def exec_action_2(action, cnt, x, y, d, wx, wy):
+def exec_action_2(action, cnt, x, y, wx, wy):
     if action in DIRS.keys():
         wx, wy, _ = exec_action(action, cnt, wx, wy, "")
-        return x, y, d, wx, wy
+        return x, y, wx, wy
     if action == "L":
         wx, wy = rotate_left_around_0(wx, wy, cnt // 90)
-        return x, y, d, wx, wy
+        return x, y, wx, wy
     if action == "R":
         wx, wy = rotate_left_around_0(wx, wy, 4 - cnt // 90)
-        return x, y, d, wx, wy
+        return x, y, wx, wy
     if action == "F":
-        return x + wx*cnt, y + wy*cnt, d, wx, wy
+        return x + wx*cnt, y + wy*cnt, wx, wy
 
 
 with PuzzleContext(year=2020, day=12) as ctx:
@@ -61,7 +61,6 @@ with PuzzleContext(year=2020, day=12) as ctx:
     # Part 2
     wx, wy = 10, 1  # relative to the ship
     x, y = 0, 0
-    curr_dir = "E"
     for action, cnt in actions:
-        x, y, curr_dir, wx, wy = exec_action_2(action, cnt, x, y, curr_dir, wx, wy)   
+        x, y, wx, wy = exec_action_2(action, cnt, x, y, wx, wy)   
     ctx.submit(2, abs(x) + abs(y))
