@@ -1,97 +1,67 @@
 from puzzle import PuzzleContext
+from collections import OrderedDict
+
+DIRS = OrderedDict(
+    N=(0, +1),
+    W=(-1, 0),
+    S=(0, -1),
+    E=(+1, 0),
+)
 
 def rotate_left(direction, amnt):
     if amnt == 0:
         return direction
-    if direction == "N":
-        return rotate_left("W", amnt-1)
-    if direction == "W":
-        return rotate_left("S", amnt-1)
-    if direction == "S":
-        return rotate_left("E", amnt-1)
-    if direction == "E":
-        return rotate_left("N", amnt-1)
+    directions = list(DIRS)
+    i = directions.index(direction)
+    i = (i + 1) % len(directions)
+    return rotate_left(directions[i], amnt-1)
 
 
 def exec_action(action, cnt, x, y, d):
-    if action == "N":
-        return x, y + cnt, d
-    if action == "S":
-        return x, y - cnt, d
-    if action == "E":
-        return x + cnt, y, d
-    if action == "W":
-        return x - cnt, y, d
+    if action in DIRS.keys():
+        dx, dy = DIRS[action]
+        return x + dx*cnt, y + dy*cnt, d
     if action == "L":
-        if cnt % 90 != 0:
-            raise ValueError
-        cnt //= 90
-        return x, y, rotate_left(d, cnt)
-        
+        return x, y, rotate_left(d, cnt // 90)
     if action == "R":
-        if cnt % 90 != 0:
-            raise ValueError
-        cnt //= 90
-        return x, y, rotate_left(d, 4-cnt)
+        return x, y, rotate_left(d, 4 - cnt // 90)
     if action == "F":
         return exec_action(d, cnt, x, y, d)
 
-def rotate_left_around(x, y, x0, y0, cnt):
+def rotate_left_around_0(x, y, cnt):
     if cnt == 0:
         return x, y
-    x -= x0
-    y -= y0
     x, y = -y, x
-    x += x0
-    y += y0
-    return rotate_left_around(x, y, x0, y0, cnt-1)
+    return rotate_left_around_0(x, y, cnt-1)
 
-def exec_action2(action, cnt, x, y, d, wx, wy):
-    if action in "NSEW":
+def exec_action_2(action, cnt, x, y, d, wx, wy):
+    if action in DIRS.keys():
         wx, wy, _ = exec_action(action, cnt, wx, wy, "")
         return x, y, d, wx, wy
     if action == "L":
-        cnt //= 90
-        wx, wy = rotate_left_around(wx, wy, x, y, cnt)
+        wx, wy = rotate_left_around_0(wx, wy, cnt // 90)
         return x, y, d, wx, wy
     if action == "R":
-        cnt //= 90
-        wx, wy = rotate_left_around(wx, wy, x, y, 4-cnt)
+        wx, wy = rotate_left_around_0(wx, wy, 4 - cnt // 90)
         return x, y, d, wx, wy
-
     if action == "F":
-        dx = (wx-x)*cnt
-        dy = (wy-y)*cnt
-        x += dx
-        y += dy
-        wx += dx
-        wy += dy
-        return x, y, d, wx, wy
+        return x + wx*cnt, y + wy*cnt, d, wx, wy
 
 
 with PuzzleContext(year=2020, day=12) as ctx:
-    ans1 = None
-    ans2 = None
-
+    actions = [(line[0], int(line[1:])) for line in ctx.nonempty_lines]
+    
+    # Part 1
     curr_dir = "E"
-    x = 0
-    y = 0
-    for line in ctx.nonempty_lines:
-        action, cnt = line[0], int(line[1:])
+    x, y = 0, 0
+    for action, cnt in actions:
         x, y, curr_dir = exec_action(action, cnt, x, y, curr_dir)
+    ctx.submit(1, abs(x) + abs(y))
 
-    ans1 = abs(x) + abs(y)
-
-    wx = 10
-    wy = 1
-    x = 0
-    y = 0
+    # Part 2
+    wx, wy = 10, 1  # relative to the ship
+    x, y = 0, 0
     curr_dir = "E"
-    for line in ctx.nonempty_lines:
-        action, cnt = line[0], int(line[1:])
-        x, y, curr_dir, wx, wy = exec_action2(action, cnt, x, y, curr_dir, wx, wy)
-            
-    ans2 = abs(x) + abs(y)
-
-    ctx.submit(1, ans1)
-    ctx.submit(2, ans2)
+    for action, cnt in actions:
+        x, y, curr_dir, wx, wy = exec_action_2(action, cnt, x, y, curr_dir, wx, wy)   
+    ctx.submit(2, abs(x) + abs(y))
