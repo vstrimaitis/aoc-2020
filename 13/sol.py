@@ -50,3 +50,8 @@ with PuzzleContext(year=2020, day=13) as ctx:
         congruences.append((x, n1*n2))
 
     ctx.submit(2, congruences[0][0] % congruences[0][1])
+    # Alternative solution:
+    # from sympy.ntheory.modular import crt
+    # moduli = [x[1] for x in congruences]
+    # residues = [x[0] for x in congruences]
+    # ans2 = crt(moduli, residues)[0]
