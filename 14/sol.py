@@ -4,60 +4,48 @@ import re
 def expand(x):
     if "X" not in x:
         return [x]
-    res = []
-    for i, c in enumerate(x):
-        if c == "X":
-            x0 = x[:i] + "0" + x[i+1:]
-            x1 = x[:i] + "1" + x[i+1:]
-            res.extend(expand(x0))
-            res.extend(expand(x1))
-            break
-    return res
+    x0 = x.replace("X", "0", 1)
+    x1 = x.replace("X", "1", 1)
+    return expand(x0) + expand(x1)
 
+def parse_line(line):
+    m = re.match(r"mask = ([01X]+)", line)
+    if m:
+        return "mask", [m[1]]
+    m = re.match(r"mem\[(\d+)\] = (\d+)", line)
+    if m:
+        return "mem", [int(m[1]), int(m[2])]
+
+def apply_mask(val, mask, subst_table):
+    return "".join([subst_table[c1] or c2 for c1, c2 in zip(mask, val)])
+    
 with PuzzleContext(year=2020, day=14) as ctx:
-    ans1 = None
-    ans2 = None
-
     prog = ctx.nonempty_lines
 
-    mask = "X"*36
+    # Part 1
+    mask = None
     mem = dict()
     for line in prog:
-        m = re.match(r"mem\[(\d+)\] = (\d+)", line)
-        if m:
-            addr = int(m[1])
-            val = bin(int(m[2]))[2:].rjust(36, "0")
-            new_val = []
-            for c1, c2 in zip(mask, val):
-                if c1 == "X":
-                    new_val.append(c2)
-                else:
-                    new_val.append(c1)
-            new_val = "".join(new_val)
-            mem[addr] = int(new_val, 2)
-        m = re.match(r"mask = ([01X]+)", line)
-        if m:
-            mask = m[1]
+        op, args = parse_line(line)
+        if op == "mask":
+            mask = args[0]
+        else:
+            [addr, val] = args
+            val = bin(val)[2:].rjust(36, "0")
+            val = apply_mask(val, mask, {"X": None, "0": "0", "1": "1"})
+            mem[addr] = int(val, 2)
     ctx.submit(1, sum(mem.values()))
 
+    # Part 2
     mem = dict()
     for line in prog:
-        m = re.match(r"mask = ([01X]+)", line)
-        if m:
-            mask = m[1]
-            continue
-        m = re.match(r"mem\[(\d+)\] = (\d+)", line)
-        addr = bin(int(m[1]))[2:].rjust(36, "0")
-        val = int(m[2])
-        new_addr = []
-        for c1, c2 in zip(mask, addr):
-            if c1 in "X1":
-                new_addr.append(c1)
-            elif c1 == "0":
-                new_addr.append(c2)
-        new_addr = "".join(new_addr)
-
-        for addr in expand(new_addr):
-            mem[int(addr, 2)] = val
-    
+        op, args = parse_line(line)
+        if op == "mask":
+            mask = args[0]
+        else:
+            [addr, val] = args
+            addr = bin(addr)[2:].rjust(36, "0")
+            addr = apply_mask(addr, mask, {"X": "X", "1": "1", "0": None})
+            for a in expand(addr):
+                mem[int(a, 2)] = val
     ctx.submit(2, sum(mem.values()))
