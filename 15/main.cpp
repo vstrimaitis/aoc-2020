@@ -96,24 +96,18 @@ Input read() {
 }
 
 int simulate(Input nums, int amnt) {
-    unordered_map<int, vector<int>> whens;
+    vector<int> whens(amnt, -1); // all said numbers will be < amnt
     FOR(i, 0, nums.size()) {
-        whens[nums[i]].pb(i);
+        whens[nums[i]] = i;
     }
 
-    FOR(i, nums.size(), amnt) {
-        int x = nums[i-1];
-        int speak;
-        if (whens[x].size() == 1) {
-            speak = 0;
-        } else {
-            const auto& w = whens[x];
-            speak = w[w.size() - 1] - w[w.size() - 2];
-        }
-        whens[speak].pb(i);
-        nums.pb(speak);
+    int next = 0;
+    FOR(i, nums.size(), amnt-1) {
+        int x = whens[next] == -1 ? 0 : i - whens[next];
+        whens[next] = i;
+        next = x;
     }
-    return nums[amnt-1];
+    return next;
 }
 
 Output part1(Input nums) {
