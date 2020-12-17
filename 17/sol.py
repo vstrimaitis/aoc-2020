@@ -1,7 +1,7 @@
 from puzzle import PuzzleContext
 import itertools
 
-def get_neigh_coords(space, coord):
+def get_neigh_coords(coord):
     c = []
     deltas = list(itertools.product([-1, 0, 1], repeat=len(coord)))
     for delta in deltas:
@@ -13,7 +13,7 @@ def get_neigh_coords(space, coord):
 
 def get_neighs(space, coord):
     neighs = []
-    for c in get_neigh_coords(space, coord):
+    for c in get_neigh_coords(coord):
         if c not in space:
             neighs.append(".")
         else:
@@ -37,7 +37,7 @@ def simulate(space):
     new_space = space.copy()
 
     for c in space:
-        for nc in get_neigh_coords(space, c):
+        for nc in get_neigh_coords(c):
             if nc not in new_space:
                 new_space[nc] = "."
 
@@ -73,7 +73,6 @@ def print_slice(space, z):
         for j in range(min_j, max_j+1):
             print(space[(z, i, j)], end="")
         print()
-    
 
 def print_space(space, header=None):
     if header is not None:
@@ -86,32 +85,22 @@ def print_space(space, header=None):
     print()
 
 with PuzzleContext(year=2020, day=17) as ctx:
-    ans1 = None
-    ans2 = None
-
-    brd = ctx.nonempty_lines
-
+    # Part 1
     space = dict()
     for i, r in enumerate(ctx.nonempty_lines):
         for j, c in enumerate(r):
             space[(0, i, j)] = c
-    
     # print_space(space, header="Before any cycles:")
-
     for i in range(6):
         space = simulate(space)
-
+        # print_space(space, header=f"After {i+1} cycles:")
     ctx.submit(1, list(space.values()).count("#"))
     
-
+    # Part 2
     space = dict()
     for i, r in enumerate(ctx.nonempty_lines):
         for j, c in enumerate(r):
             space[(0, 0, i, j)] = c
-    
-    # print_space(space, header="Before any cycles:")
-
     for i in range(6):
         space = simulate(space)
-
     ctx.submit(2, list(space.values()).count("#"))
