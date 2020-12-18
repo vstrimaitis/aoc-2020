@@ -15,7 +15,7 @@ def to_rpn(expr, op_precs):
         if token in "0123456789":
             output.append(int(token))
         elif token in op_precs.keys():
-            while len(ops) > 0 and op_precs.get(ops[-1], 1e9) >= op_precs.get(token, 1e9) and ops[-1] != "(":
+            while len(ops) > 0 and ops[-1] in op_precs and op_precs[ops[-1]] >= op_precs[token] and ops[-1] != "(":
                 output.append(ops.pop())
             ops.append(token)
         elif token == "(":
