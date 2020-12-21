@@ -1,5 +1,7 @@
 from puzzle import PuzzleContext
 from collections import defaultdict
+import networkx as nx
+
 
 
 with PuzzleContext(year=2020, day=21) as ctx:
@@ -37,21 +39,15 @@ with PuzzleContext(year=2020, day=21) as ctx:
         ans1 += counts[x]
     ctx.submit(1, ans1)
 
-    mapping = []
-    while len(can_contain) > 0:
-        picked = None
-        for k in can_contain:
-            if len(can_contain[k]) == 1:
-                picked = k
-                break
-        assert picked is not None
-        ing = list(can_contain[picked])[0]
-        for k, v in can_contain.items():
-            if ing in v:
-                v.remove(ing)
-        mapping.append((ing, picked))
-        del can_contain[picked]
+    G = nx.Graph()
+    for k, v in can_contain.items():
+        G.add_node(k, bipartite=0)
+        for vv in v:
+            G.add_node(vv, bipartite=1)
+            G.add_edge(k, vv)
     
-    ans2 = ",".join(x[0] for x in sorted(mapping, key=lambda x: x[1]))
+    mapping = [(v, k) for k, v in nx.bipartite.matching.hopcroft_karp_matching(G, all_allergens).items() if k in all_allergens]
+    mapping = ",".join(x[0] for x in sorted(mapping, key=lambda x: x[1]))
+    print(mapping)
 
-    ctx.submit(2, ans2)
+    ctx.submit(2, None)
