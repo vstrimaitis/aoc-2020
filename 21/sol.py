@@ -1,7 +1,5 @@
 from puzzle import PuzzleContext
 from collections import defaultdict
-import networkx as nx
-
 
 
 with PuzzleContext(year=2020, day=21) as ctx:
