@@ -1,33 +1,5 @@
 from puzzle import PuzzleContext
 
-
-def move_1_to_front(cups):
-    idx = cups.index(1)
-    return cups[idx:] + cups[:idx]
-
-def do_move(cups, curr):
-    n = len(cups)
-    curr_val = cups[curr]
-    picked = [cups[(curr+1)%n], cups[(curr+2)%n], cups[(curr+3)%n]]
-    cups = [x for x in cups if x not in picked]
-        
-    dest_val = curr_val - 1
-    vals = set(cups)
-    while True:
-        if dest_val in vals:
-            dest_idx = cups.index(dest_val)
-            break
-        else:
-            dest_val -= 1
-            if dest_val < min(cups):
-                dest_val = max(cups)
-
-    cups = cups[:dest_idx+1] + picked + cups[dest_idx+1:]
-    cups = move_1_to_front(cups)
-    curr = cups.index(curr_val)
-    curr = (curr + 1) % n
-    return cups, curr
-
 def simulate(cups, iters):
     nxt = dict()
     prev = cups[-1]
