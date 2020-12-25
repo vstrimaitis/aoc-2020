@@ -26,6 +26,9 @@ with PuzzleContext(year=2020, day=25) as ctx:
     card_loop = discrete_log(7, card_pub, MOD)
     door_loop = discrete_log(7, door_pub, MOD)
 
+    print("card loop size", card_loop)
+    print("door loop size", door_loop)
+
     assert card_pub == pow(7, card_loop, MOD)
     assert door_pub == pow(7, door_loop, MOD)
 
